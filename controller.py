@@ -22,7 +22,6 @@ class Controller:
 
     def get_text_about_stocks(self, client: Client) -> str:
         fire_number = (client.expenses_per_month * 12 / 0.04)
-        print(funds)
         average_profit = sum(
             self._search_fund_by_id(self.funds, key).average_profit * value
             for key, value
