@@ -6,6 +6,7 @@ from typing import Optional
 class Client:
     years_before_retirement: int
     expenses_per_month: int
+    personal_funds: dict
 
 
 @dataclass

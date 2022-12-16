@@ -28,5 +28,5 @@ class StocksStatistics:
 stocks_statistics = StocksStatistics()
 print(stocks_statistics.get_top_stocks(
     weights={5: 0.33, 6: 0.33, 7: 0.34},
-    n_top=10,
+    n_top=5,
 ))
