@@ -25,3 +25,10 @@ class Fund:
         """ Вычисляет уровень риска фонда """
         self.risk_level = profit_coef * self.negative_years / (
                 self.negative_years + self.positive_years) + volatility_coef * self.average_volatility
+
+@dataclass
+class Stock:
+    fund_id: int
+    name: str
+    part: float
+    type: str
