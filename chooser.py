@@ -51,3 +51,4 @@ class Chooser:
                f'Для соответствия инвестиционному плану в этом месяце надо купить: \n' \
                f'{int(yearly / 60 * 0.3 / 12 / biotech_fund.price)} паев фонда {biotech_fund.name} \n' \
                f'{int(yearly / 60 * 0.7 / 12 / technology_fund.price)} паев фонда {technology_fund.name}'
+
