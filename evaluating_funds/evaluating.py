@@ -6,23 +6,15 @@ from db.db import DBLoader
 from models.models import Fund, Client
 
 
-def evaluate_funds_rating(funds: list):  # -> list[Fund]:
-    """ Оцениваем все фонды по риску и доходности """
+def evaluate_funds_rating(funds: list) -> list[tuple[int, float]]:
+    """ Возвращает отсортированный по рейтингу список id фондов """
     funds_ratings = dict()
     for fund in funds:
         fund.count_risk_level()
         fund_id = fund.id
-        name = fund.full_name
         rating = fund_ranking_function(fund)
-        profit = fund.average_profit
-        volatility = fund.average_volatility
-        risk_level = fund.risk_level
-        funds_ratings[fund_id] = dict(name=name,
-                                      profit=profit,
-                                      volatility=volatility,
-                                      risk_level=risk_level,
-                                      rating=rating)
-    return funds_ratings
+        funds_ratings[fund_id] = rating
+    return sorted(funds_ratings.items(), key=lambda k: k[1], reverse=True)
 
 
 def evaluate_personal_rating(categories: list[str], funds_ratings):
@@ -38,6 +30,10 @@ def get_personal_funds(client: Client, funds: list[Fund]) -> dict[int, float]:
                                                 funds_ratings=funds_ratings)
 
     return {0: 0.5}
+
+
+def add_categories_to_fund(funds: list[Fund]):
+    pass
 
 
 def predict_next_year_profit():

@@ -26,6 +26,7 @@ class Fund:
     negative_years: int
 
     risk_level: float = 1000
+    fields_of_stock: list[str] = field(default_factory=list)
 
     def count_risk_level(self, profit_coef: float = 0.6,
                          volatility_coef: float = 0.4) -> None:
