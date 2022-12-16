@@ -30,10 +30,11 @@ class DBLoader:
         return raw_records
 
     def load_stocks(self) -> list[Stock]:
+        """Загружает информацию об акциях из БД."""
         raw_records = self._load_sql('''SELECT * FROM stocks''')
         return [
             Stock(
-                fund_id=record['id_fund'],
+                fund_id=int(record['id_fund']),
                 name=record['stock_name'],
                 part=record['part'],
                 type=record['type'],
@@ -43,7 +44,7 @@ class DBLoader:
         ]
 
     def load_funds(self) -> list[Fund]:
-        """ Загружает информацию о фондах из БД """
+        """Загружает информацию о фондах из БД."""
         raw_records = self._load_sql('''SELECT * FROM funds''')
         return [
             Fund(
