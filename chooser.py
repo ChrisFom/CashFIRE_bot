@@ -6,7 +6,6 @@ from typing import Optional
 class Client:
     years_before_retirement: int
     expenses_per_month: int
-    personal_funds: dict
 
 
 @dataclass
@@ -44,12 +43,12 @@ class Chooser:
     def get_text_about_stocks(self, client: Client) -> str:
         fire_number = (client.expenses_per_month * 12 / 0.04)
         average_profit = (0.3 * biotech_fund.average_profit + 0.7 * technology_fund.average_profit)
-        yearly = fire_number / client.years_before_retirement / ((1 + (average_profit / 100)) ** client.years_before_retirement)
+        yearly = fire_number / client.years_before_retirement / (
+                    (1 + (average_profit / 100)) ** client.years_before_retirement)
         return f'\nДо пенсии осталось {client.years_before_retirement} лет\n' \
                f'Ежемесячные траты составляют {client.expenses_per_month} рублей\n' \
-               f'Без учета сложного процента надо откладывать {int(fire_number/client.years_before_retirement)} рублей в год\n' \
+               f'Без учета сложного процента надо откладывать {int(fire_number / client.years_before_retirement)} рублей в год\n' \
                f'С учетом сложного процента надо откладывать {int(yearly)} рублей в год\n\n' \
                f'Для соответствия инвестиционному плану в этом месяце надо купить: \n' \
                f'{int(yearly / 60 * 0.3 / 12 / biotech_fund.price)} паев фонда {biotech_fund.name} \n' \
                f'{int(yearly / 60 * 0.7 / 12 / technology_fund.price)} паев фонда {technology_fund.name}'
-

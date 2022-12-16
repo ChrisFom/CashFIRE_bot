@@ -1,8 +1,7 @@
 import logging
 
-from chooser import Client
 from db.db import DBLoader
-from models.models import Fund
+from models.models import Client, Fund
 
 
 class Evaluator:
