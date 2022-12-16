@@ -17,20 +17,20 @@ class Controller:
         self.evaluator = Evaluator()
 
     def get_personal_funds(self, client: Client):
-        funds = self._loader.load_funds()
-        return self.evaluator.get_personal_funds(client, funds)
+        self.funds = self._loader.load_funds()
+        return self.evaluator.get_personal_funds(client, self.funds)
 
-    def get_text_about_stocks(self, client: Client, funds: list[Fund]) -> str:
+    def get_text_about_stocks(self, client: Client) -> str:
         fire_number = (client.expenses_per_month * 12 / 0.04)
         average_profit = sum(
-            self._search_fund_by_id(funds, key).average_profit * value
+            self._search_fund_by_id(self.funds, key).average_profit * value
             for key, value
             in client.personal_funds.items()
         )
         yearly = fire_number / client.years_before_retirement / ((1 + average_profit) ** client.years_before_retirement)
         final_text = ''
         for id, weight in client.personal_funds.items():
-            fund_info = self._search_fund_by_id(funds, id)
+            fund_info = self._search_fund_by_id(self.funds, id)
             final_text += f'{int(yearly / 60 * 0.3 / 12 / fund_info.price)} паев фонда {fund_info.full_name} \n'
         return f'\nДо пенсии осталось {client.years_before_retirement} лет\n' \
                f'Ежемесячные траты составляют {client.expenses_per_month} рублей\n' \
