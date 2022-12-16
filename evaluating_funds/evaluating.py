@@ -21,16 +21,10 @@ class FundInfo:
     risk_level: float
 
 
-def evaluate_funds(funds: list[FundInfo]):
+def evaluate_funds(funds: list[Fund]):
     """ Оцениваем все фонды по риску и доходности """
     for fund in funds:
-        fund.risk_level = count_fund_risk_level(fund)
-
-
-def count_fund_risk_level(fund: FundInfo) -> float:
-    """ Возвращает для фонда его уровень риска """
-    risk_level = 0.6 * fund.negative_profit_years / fund.total_years + 0.4 * fund.volatility
-    return risk_level
+        fund.count_risk_level()
 
 
 def predict_next_year_profit():
