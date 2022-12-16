@@ -4,16 +4,16 @@ from collections import defaultdict
 import re
 import os
 from dotenv import load_dotenv
-
-from chooser import Client, Chooser
-
+from models.models import Client
+#from chooser import Client, Chooser
+from statistics.stocks import StocksStatistics
+from controller import Controller
 load_dotenv()
 
 token = os.getenv('TOKEN')
 updater = Updater(token=token)
 users = defaultdict()
 
-#bot_client = Client(years_before_retirement=years_before_retirement, expenses_per_month=expenses_per_month)
 
 def say_hi(update, context):
     chat = update.effective_chat
@@ -54,12 +54,13 @@ def determine_type(update, context):
     print(context.args)
 
 
-def salary(update, context):
-    global years_before_retirement
+def get_years_before_retirement(update, context):
+
     chat = update.effective_chat
     years_before_retirement_dirty = update.message.text
     years_before_retirement = int(re.sub("[^0-9]", "", years_before_retirement_dirty))
-
+    if update.message.chat_id not in users:
+        users[chat.id] = Client(years_before_retirement=years_before_retirement)
     context.bot.send_message(
         chat_id=chat.id,
         text='Сколько тратите в месяц? Заполни ответ по образцу. Пример: 10000 рублей(долларов, сом, евро)',
@@ -68,10 +69,13 @@ def salary(update, context):
 
 
 def industries_lev1(update, context):
-    global expenses_per_month
+
     chat = update.effective_chat
     expenses_per_month_dirty = update.message.text
     expenses_per_month = int(re.sub("[^0-9]", "", expenses_per_month_dirty))
+    if update.message.chat_id in users:
+        users.get(chat.id).expenses_per_month = expenses_per_month
+
     buttons = ReplyKeyboardMarkup([['Банки и финансы', 'Машиностроение'], ['Металлы и добыча']],
                                   resize_keyboard=True)
     context.bot.send_message(
@@ -125,22 +129,25 @@ def thanks(update, context):
 
 def get_result(update, context):
     chat = update.effective_chat
-    if update.message.chat_id not in users:
-        users[chat.id] = Client(years_before_retirement=years_before_retirement, expenses_per_month=expenses_per_month)
     print(users[chat.id])
-    result_text = Chooser().get_text_about_stocks(client=users[chat.id])
+    if update.message.chat_id in users:
+        funds = Controller().get_personal_funds(client=users.get(chat.id))
+        users.get(chat.id).personal_funds = funds
+    result_text = Controller().get_text_about_stocks(client=users[chat.id], funds=funds)
+    buttons = ReplyKeyboardMarkup([['Самые выгодные акции']], resize_keyboard=True)
     context.bot.send_message(
         chat_id=chat.id,
         text= result_text,
+        reply_markup=buttons
     )
 
 
-def motivation_quote(update, context):
+def get_top_stocks(update, context):
     chat = update.effective_chat
+    stocks = StocksStatistics().get_top_stocks(weights={5: 0.33, 6: 0.33, 7: 0.34}, n_top=10)
     context.bot.send_message(
         chat_id=chat.id,
-        text='Инвестирование должно напоминать наблюдение за тем, как сохнет краска или как растет трава.'
-             ' Если вам нужен азарт, то возьмите 800 долларов и поезжайте в Лас-Вегас.',
+        text=stocks,
     )
 
 
@@ -149,7 +156,7 @@ def main():
     updater.dispatcher.add_handler(CommandHandler('go', wake_up))
     updater.dispatcher.add_handler(CommandHandler('DetermineInvestorType', determine_type))
     updater.dispatcher.add_handler(
-        MessageHandler(Filters.regex(re.compile('лет|года', re.IGNORECASE)), salary))
+        MessageHandler(Filters.regex(re.compile('лет|года', re.IGNORECASE)), get_years_before_retirement))
 
     updater.dispatcher.add_handler(
         MessageHandler(Filters.regex(re.compile('рублей|долларов|сом|тенге|евро', re.IGNORECASE)),
@@ -168,6 +175,9 @@ def main():
 
     updater.dispatcher.add_handler(MessageHandler(Filters.regex(re.compile(
         'Хочу узнать результат!', re.IGNORECASE)), get_result))
+
+    updater.dispatcher.add_handler(MessageHandler(Filters.regex(re.compile(
+        'Самые выгодные акции', re.IGNORECASE)), get_top_stocks))
 
     updater.start_polling()
     updater.idle()

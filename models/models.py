@@ -6,6 +6,7 @@ class Client:
     years_before_retirement: int = 0
     expenses_per_month: int = 0
     categories: list[str] = field(default_factory=list)
+    personal_funds: dict = field(default_factory=dict)
 
 
 @dataclass

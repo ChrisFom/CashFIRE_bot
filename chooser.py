@@ -4,8 +4,8 @@ from typing import Optional
 
 @dataclass
 class Client:
-    years_before_retirement: int
-    expenses_per_month: int
+    years_before_retirement: Optional[int] = None
+    expenses_per_month: Optional[int] = None
 
 
 @dataclass
