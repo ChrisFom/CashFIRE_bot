@@ -1,9 +1,12 @@
+import os
 from dataclasses import dataclass
 
 import psycopg2
+from dotenv import load_dotenv
 from psycopg2.extras import RealDictCursor
 
-from config import config
+
+load_dotenv()
 
 
 @dataclass
@@ -16,7 +19,13 @@ class Fund:
     lot: int
 
 
-connection = psycopg2.connect(**config)
+connection = psycopg2.connect(
+    database=os.environ['DATABASE'],
+    user=os.environ['DB_USER'],
+    password=os.environ['PASSWORD'],
+    host=os.environ['HOST'],
+    port=os.environ['PORT'],
+)
 cursor = connection.cursor(cursor_factory=RealDictCursor)
 cursor.execute('SELECT * from stocks')
 raw_records = cursor.fetchall()
