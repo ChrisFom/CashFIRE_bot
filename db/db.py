@@ -11,6 +11,7 @@ load_dotenv()
 
 @dataclass
 class Fund:
+    id: int
     full_name: str
     ticker: str
     price: float
@@ -39,6 +40,7 @@ connection.close()
 
 records = [
     Fund(
+        id=record['id'],
         full_name=record['full_fund'],
         ticker=record['ticker'],
         price=record['price'],
