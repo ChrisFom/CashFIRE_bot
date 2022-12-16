@@ -5,9 +5,10 @@ import re
 import os
 from dotenv import load_dotenv
 from models.models import Client
-#from chooser import Client, Chooser
+# from chooser import Client, Chooser
 from statistics.stocks import StocksStatistics
 from controller import Controller
+
 load_dotenv()
 
 token = os.getenv('TOKEN')
@@ -55,7 +56,6 @@ def determine_type(update, context):
 
 
 def get_years_before_retirement(update, context):
-
     chat = update.effective_chat
     years_before_retirement_dirty = update.message.text
     years_before_retirement = int(re.sub("[^0-9]", "", years_before_retirement_dirty))
@@ -69,7 +69,6 @@ def get_years_before_retirement(update, context):
 
 
 def industries_lev1(update, context):
-
     chat = update.effective_chat
     expenses_per_month_dirty = update.message.text
     expenses_per_month = int(re.sub("[^0-9]", "", expenses_per_month_dirty))
@@ -138,7 +137,7 @@ def get_result(update, context):
     buttons = ReplyKeyboardMarkup([['Самые выгодные акции']], resize_keyboard=True)
     context.bot.send_message(
         chat_id=chat.id,
-        text= result_text,
+        text=result_text,
         reply_markup=buttons
     )
 
@@ -183,6 +182,7 @@ def main():
     updater.start_polling()
     updater.idle()
     print(users)
+
 
 if __name__ == '__main__':
     main()

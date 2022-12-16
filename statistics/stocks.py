@@ -1,13 +1,11 @@
 from collections import defaultdict
 
-from db.db import DBLoader
+from data_source.data_loaders import DBLoader
 from models.models import Stock
 
 
 class StocksStatistics:
-
     _loader = DBLoader()
-
 
     def get_top_stocks(self, weights: dict[int, float], n_top: int):
         stocks = self.get_all_stocks(weights)[:n_top]
@@ -17,7 +15,6 @@ class StocksStatistics:
             nice_stocks.append(f'{i[0]} - {round(i[1], 3)}')
         nice_stock_string = "\n".join(nice_stocks)
         return nice_stock_string
-
 
     def get_all_stocks(self, weights: dict[int, float]) -> list[Stock]:
         stocks = self._loader.load_stocks()
