@@ -67,7 +67,7 @@ class DBLoader:
             in raw_records
         ]
 
-    def load_field_of_stock(self):
+    def load_categories_of_funds(self) -> dict[int, list[str]]:
         """ Возвращает словарь с id фонда и списком отраслей  """
         raw_records = self._load_sql('''SELECT * FROM otrasl''')
 

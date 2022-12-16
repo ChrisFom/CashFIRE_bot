@@ -10,4 +10,4 @@ from pprint import pprint
 # pprint(funds)
 
 loader = DBLoader()
-pprint(loader.load_field_of_stock())
+pprint(loader.load_categories_of_funds())

@@ -26,14 +26,20 @@ def get_personal_funds(client: Client, funds: list[Fund]) -> dict[int, float]:
     """ Возвращает персонализированные рекомендации фондов для клиента, основываясь на предпочтительных категориях """
     personal_categories = client.categories
     funds_ratings = evaluate_funds_rating(funds=funds)
+
     personal_ratings = evaluate_personal_rating(categories=personal_categories,
                                                 funds_ratings=funds_ratings)
 
     return {0: 0.5}
 
 
-def add_categories_to_fund(funds: list[Fund]):
-    pass
+def add_categories_to_fund(funds: list[Fund]) -> list[Fund]:
+    loader = DBLoader()
+    categories = loader.load_categories_of_funds()
+    for fund in funds:
+        fund.categories = categories[fund.id]
+
+    return funds
 
 
 def predict_next_year_profit():
