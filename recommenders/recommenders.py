@@ -1,5 +1,5 @@
 from pprint import pprint
-from typing import Any, Union
+from typing import Union
 
 import numpy as np
 
@@ -8,9 +8,6 @@ from models.models import Fund, Client
 
 
 class FundsRecommender:
-    def __init__(self):
-        pass
-
     @staticmethod
     def get_personal_funds(client: Client, funds: list[Fund], top_n: int = 5) -> dict[int, float]:
         """ Возвращает персонализированные рекомендации фондов для клиента,
