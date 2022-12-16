@@ -15,3 +15,11 @@ class Fund:
     average_volatility: float
     best_profit: float
     worst_profit: float
+
+
+@dataclass
+class Stock:
+    fund_id: int
+    name: str
+    part: float
+    type: str
