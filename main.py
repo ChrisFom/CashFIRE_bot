@@ -130,10 +130,11 @@ def thanks(update, context):
 def get_result(update, context):
     chat = update.effective_chat
     print(users[chat.id])
+    controller = Controller()
     if update.message.chat_id in users:
-        funds = Controller().get_personal_funds(client=users.get(chat.id))
+        funds = controller.get_personal_funds(client=users.get(chat.id))
         users.get(chat.id).personal_funds = funds
-    result_text = Controller().get_text_about_stocks(client=users[chat.id], funds=funds)
+    result_text = controller.get_text_about_stocks(client=users[chat.id])
     buttons = ReplyKeyboardMarkup([['Самые выгодные акции']], resize_keyboard=True)
     context.bot.send_message(
         chat_id=chat.id,
