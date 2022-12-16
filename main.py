@@ -1,15 +1,19 @@
 from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
 from telegram import ReplyKeyboardMarkup
-
+from collections import defaultdict
 import re
 import os
 from dotenv import load_dotenv
+
+from chooser import Client, Chooser
 
 load_dotenv()
 
 token = os.getenv('TOKEN')
 updater = Updater(token=token)
+users = defaultdict()
 
+#bot_client = Client(years_before_retirement=years_before_retirement, expenses_per_month=expenses_per_month)
 
 def say_hi(update, context):
     chat = update.effective_chat
@@ -30,7 +34,7 @@ def wake_up(update, context):
     name = update.message.chat.first_name
 
     buttons = ReplyKeyboardMarkup(
-        [['/DetermineInvestorType', '/GetGift'], ['/FinancialNews', '/MotivationalQuote']],
+        [['/DetermineInvestorType']],
         resize_keyboard=True)
     context.bot.send_message(
         chat_id=chat.id,
@@ -42,20 +46,20 @@ def wake_up(update, context):
 
 def determine_type(update, context):
     chat = update.effective_chat
-    buttons = ReplyKeyboardMarkup([['/NextSalary']], resize_keyboard=True)
     context.bot.send_message(
         chat_id=chat.id,
         text='Через сколько лет вы хотите выйти на пенсию? Заполни ответ по образцу. Пример: 5 лет(2 года)',
-        reply_markup=buttons
 
     )
     print(context.args)
 
 
 def salary(update, context):
+    global years_before_retirement
     chat = update.effective_chat
-    years_pensia = update.message.text
-    print(years_pensia, 'годы до пенсии')
+    years_before_retirement_dirty = update.message.text
+    years_before_retirement = int(re.sub("[^0-9]", "", years_before_retirement_dirty))
+
     context.bot.send_message(
         chat_id=chat.id,
         text='Сколько тратите в месяц? Заполни ответ по образцу. Пример: 10000 рублей(долларов, сом, евро)',
@@ -64,9 +68,10 @@ def salary(update, context):
 
 
 def industries_lev1(update, context):
-    global salary
+    global expenses_per_month
     chat = update.effective_chat
-    salary = update.message.text
+    expenses_per_month_dirty = update.message.text
+    expenses_per_month = int(re.sub("[^0-9]", "", expenses_per_month_dirty))
     buttons = ReplyKeyboardMarkup([['Банки и финансы', 'Машиностроение'], ['Металлы и добыча']],
                                   resize_keyboard=True)
     context.bot.send_message(
@@ -118,6 +123,18 @@ def thanks(update, context):
     )
 
 
+def get_result(update, context):
+    chat = update.effective_chat
+    if update.message.chat_id not in users:
+        users[chat.id] = Client(years_before_retirement=years_before_retirement, expenses_per_month=expenses_per_month)
+    print(users[chat.id])
+    result_text = Chooser().get_text_about_stocks(client=users[chat.id])
+    context.bot.send_message(
+        chat_id=chat.id,
+        text= result_text,
+    )
+
+
 def motivation_quote(update, context):
     chat = update.effective_chat
     context.bot.send_message(
@@ -146,11 +163,15 @@ def main():
         re.IGNORECASE)), industries_lev3))
     updater.dispatcher.add_handler(MessageHandler(Filters.regex(re.compile(
         'Прочие отрасли|Транспорт', re.IGNORECASE)), thanks))
+    updater.dispatcher.add_handler(MessageHandler(Filters.regex(re.compile(
+        'Прочие отрасли|Транспорт', re.IGNORECASE)), thanks))
 
-    updater.dispatcher.add_handler(CommandHandler('MotivationalQuote', motivation_quote))
+    updater.dispatcher.add_handler(MessageHandler(Filters.regex(re.compile(
+        'Хочу узнать результат!', re.IGNORECASE)), get_result))
+
     updater.start_polling()
     updater.idle()
-
+    print(users)
 
 if __name__ == '__main__':
     main()
