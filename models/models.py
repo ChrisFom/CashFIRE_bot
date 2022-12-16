@@ -1,4 +1,11 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+
+
+@dataclass
+class Client:
+    years_before_retirement: int = 0
+    expenses_per_month: int = 0
+    categories: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -18,13 +25,15 @@ class Fund:
     positive_years: int
     negative_years: int
 
-    risk_level: float
+    risk_level: float = 1000
 
     def count_risk_level(self, profit_coef: float = 0.6,
                          volatility_coef: float = 0.4) -> None:
         """ Вычисляет уровень риска фонда """
-        self.risk_level = profit_coef * self.negative_years / (
-                self.negative_years + self.positive_years) + volatility_coef * self.average_volatility
+        if self.negative_years is not None:
+            self.risk_level = profit_coef * self.negative_years / (
+                    self.negative_years + self.positive_years) + volatility_coef * self.average_volatility
+
 
 @dataclass
 class Stock:

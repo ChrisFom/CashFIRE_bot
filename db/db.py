@@ -59,6 +59,8 @@ class DBLoader:
                 commission=record['commission'],
                 average_volatility=record['avg_volatility'],
                 average_overestimation=record['avg_overestimation'],
+                positive_years=record['positive_years'],
+                negative_years=record['negative_years']
             )
             for record
             in raw_records
