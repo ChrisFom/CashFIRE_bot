@@ -73,24 +73,28 @@ class DBLoader:
 
         funds_fields = dict()
 
-        records = {int(record['id_funds']): dict(consumer_goods=record['consumer_goods'],
-                                                 currency=record['currency'],
-                                                 eco_houses=record['eco_houses'],
-                                                 eco_materials=record['eco_materials'],
-                                                 electrotransport=record['electrotransport'],
-                                                 energetics=record['energetics'],
-                                                 finance=record['finance'],
-                                                 green_energetics=record['green_energetics'],
-                                                 healthcare=record['healthcare'],
-                                                 houses=record['houses'],
-                                                 it=record['it'],
-                                                 luxury_metals=record['luxury_metals'],
-                                                 machinery=record['machinery'],
-                                                 materials=record['materials'],
-                                                 obligations=record['obligations'],
-                                                 other=record['other'],
-                                                 telecommunications=record['telecommunications'])
-                   for record in raw_records}
+        records = {
+            int(record['id_funds']): dict(
+                consumer_goods=record['consumer_goods'],
+                currency=record['currency'],
+                eco_houses=record['eco_houses'],
+                eco_materials=record['eco_materials'],
+                electrotransport=record['electrotransport'],
+                energetics=record['energetics'],
+                finance=record['finance'],
+                green_energetics=record['green_energetics'],
+                healthcare=record['healthcare'],
+                houses=record['houses'],
+                it=record['it'],
+                luxury_metals=record['luxury_metals'],
+                machinery=record['machinery'],
+                materials=record['materials'],
+                obligations=record['obligations'],
+                other=record['other'],
+                telecommunications=record['telecommunications'],
+            )
+            for record in raw_records
+        }
         for fund_id, parts in records.items():
             categories = []
             for category, part in parts.items():
