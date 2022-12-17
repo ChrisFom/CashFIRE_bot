@@ -2,20 +2,28 @@ from pprint import pprint
 from typing import Union
 
 import numpy as np
-
+from pathlib import Path
 from data_source.data_loaders import DBLoader
 from models.models import Fund, Client
+from risk_models.risk_models import RiskModel, fit_model, get_funds_info
 
 
 class FundsRecommender:
-    @staticmethod
-    def get_personal_funds(client: Client, funds: list[Fund], top_n: int = 5) -> dict[int, float]:
+    def __init__(self):
+        self.risk_model = RiskModel()
+        model_default_path: Path = Path('../pretrained_models/risk_model.pkl')
+        if model_default_path.exists():
+            self.risk_model.load_model(model_path=model_default_path)
+        else:
+            self.risk_model = fit_model()
+
+    def get_personal_funds(self, client: Client, funds: list[Fund], top_n: int = 5) -> dict[int, float]:
         """ Возвращает персонализированные рекомендации фондов для клиента,
         основываясь на предпочтительных категориях
         """
         personal_categories = client.categories
         funds = add_categories_to_fund(funds=funds)
-        funds_ratings = evaluate_funds_rating(funds=funds)
+        funds_ratings = self._evaluate_funds_rating(funds=funds, use_risk_model=True)
         personal_ratings = evaluate_personal_rating(categories=personal_categories,
                                                     funds_ratings=funds_ratings)
         sorted_personal_ratings = sort_funds_by_rating(personal_ratings)
@@ -23,16 +31,25 @@ class FundsRecommender:
         client_top_funds = {item[0]: item[1]['rating'] for item in client_top_funds}
         return client_top_funds
 
-
-def evaluate_funds_rating(funds: list[Fund]) -> dict[int, dict[str, Union[float, list[str]]]]:
-    """ Возвращает отсортированный по рейтингу список id фондов """
-    funds_ratings = dict()
-    for fund in funds:
-        fund.count_risk_level()
-        rating = fund_ranking_function(fund)
-        funds_ratings[fund.id] = dict(rating=rating,
-                                      categories=fund.categories)
-    return funds_ratings
+    def _evaluate_funds_rating(self, funds: list[Fund], use_risk_model: bool = True) -> dict[
+        int, dict[str, Union[float, list[str]]]]:
+        """ Возвращает отсортированный по рейтингу список id фондов """
+        funds_ratings = dict()
+        for fund in funds:
+            if use_risk_model:
+                features_data = np.array([fund.price,
+                                          fund.average_profit,
+                                          fund.average_volatility,
+                                          fund.positive_years,
+                                          fund.negative_years])
+                features_data = np.where(features_data == None, 0, features_data)
+                fund.risk_level = self.risk_model.predict(features_data)
+            else:
+                fund.default_count_risk_level()
+            rating = fund_ranking_function(fund)
+            funds_ratings[fund.id] = dict(rating=rating,
+                                          categories=fund.categories)
+        return funds_ratings
 
 
 def evaluate_personal_rating(categories: list[str],
@@ -74,15 +91,8 @@ def sigmoid(value):
     return 1 / (1 + 0.5 * np.exp(- (value - 5)))
 
 
-def get_finds_info() -> list[Fund]:
-    loader = DBLoader()
-    funds_info = loader.load_funds()
-
-    return funds_info
-
-
 if __name__ == "__main__":
-    funds = get_finds_info()
+    funds = get_funds_info()
     client = Client(years_before_retirement=20,
                     expenses_per_month=50000,
                     categories=['healthcare', 'it', 'consumer_goods'])
@@ -90,4 +100,4 @@ if __name__ == "__main__":
     personal_funds = recommender.get_personal_funds(client=client,
                                                     funds=funds)
 
-    pprint(personal_funds)
+    pprint(funds)

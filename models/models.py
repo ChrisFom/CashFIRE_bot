@@ -29,8 +29,8 @@ class Fund:
     risk_level: float = 1000
     categories: list[str] = field(default_factory=list)
 
-    def count_risk_level(self, profit_coef: float = 0.6,
-                         volatility_coef: float = 0.4) -> None:
+    def default_count_risk_level(self, profit_coef: float = 0.6,
+                                 volatility_coef: float = 0.4) -> None:
         """ Вычисляет уровень риска фонда """
         if self.negative_years is not None:
             self.risk_level = profit_coef * self.negative_years / (
