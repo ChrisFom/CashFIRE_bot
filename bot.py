@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from models.models import Client
 # from chooser import Client, Chooser
 from statistics.stocks import StocksStatistics
+from statistics.industries import IndustriesStatistics
 from controller import Controller
 
 load_dotenv()
@@ -140,7 +141,7 @@ def get_result(update, context):
         funds = controller.get_personal_funds(client=users.get(chat.id))
         users.get(chat.id).personal_funds = funds
     result_text = controller.get_text_about_stocks(client=users[chat.id])
-    buttons = ReplyKeyboardMarkup([['Самые выгодные акции']], resize_keyboard=True)
+    buttons = ReplyKeyboardMarkup([['Какие акции лежат в твоем портфеле?']], resize_keyboard=True)
     context.bot.send_message(
         chat_id=chat.id,
         text=result_text,
@@ -151,9 +152,21 @@ def get_result(update, context):
 def get_top_stocks(update, context):
     chat = update.effective_chat
     stocks = StocksStatistics().get_top_stocks(weights=users.get(chat.id).personal_funds, n_top=10)
+    buttons = ReplyKeyboardMarkup([['Топ отраслей из твоего портфеля?']], resize_keyboard=True)
     context.bot.send_message(
         chat_id=chat.id,
         text=stocks,
+        reply_markup=buttons
+    )
+
+
+def get_top_industries(update, context):
+    chat = update.effective_chat
+    industries = IndustriesStatistics().get_top_industries(
+        weights=users.get(chat.id).personal_funds, n_top=5)
+    context.bot.send_message(
+        chat_id=chat.id,
+        text=industries,
     )
 
 
@@ -181,7 +194,10 @@ def main():
         'Хочу узнать результат!', re.IGNORECASE)), get_result))
 
     updater.dispatcher.add_handler(MessageHandler(Filters.regex(re.compile(
-        'Самые выгодные акции', re.IGNORECASE)), get_top_stocks))
+        'Какие акции лежат в твоем портфеле?', re.IGNORECASE)), get_top_stocks))
+
+    updater.dispatcher.add_handler(MessageHandler(Filters.regex(re.compile(
+        'Топ отраслей из твоего портфеля?', re.IGNORECASE)), get_top_industries))
 
     updater.start_polling()
     updater.idle()

@@ -28,14 +28,15 @@ class IndustriesStatistics:
         return sorted(counter.items(), key=lambda item: item[1], reverse=True)
 
 
-industries = IndustriesStatistics()
-print(industries.get_top_industries(
-    {
-        1: 0.16687770921227246,
-        16: 0.15233477048199173,
-        17: 0.23478232819024963,
-        18: 0.18209965876881642,
-        19: 0.19605903400497468,
-    },
-    3
-))
+if __name__ == '__main__':
+    industries = IndustriesStatistics()
+    print(industries.get_top_industries(
+        {
+            1: 0.16687770921227246,
+            16: 0.15233477048199173,
+            17: 0.23478232819024963,
+            18: 0.18209965876881642,
+            19: 0.19605903400497468,
+        },
+        3
+    ))
