@@ -24,8 +24,10 @@ class Controller:
         )
         yearly = fire_number / client.years_before_retirement / ((1 + average_profit) ** client.years_before_retirement)
         final_text = ''
+        strategy_text = ''
         for id, weight in client.personal_funds.items():
             fund_info = self._search_fund_by_id(self.funds, id)
+            strategy_text += f'{fund_info.ticker} - {round(weight*100, 1) }% ; '
             final_text += f'{int(yearly / 60 * 0.3 / 12 / fund_info.price)} паев фонда {fund_info.full_name}' \
                           f' ( доходность {round(fund_info.average_profit*100, 1)} % )\n'
         return f'\nДо пенсии осталось {client.years_before_retirement} лет\n' \
@@ -34,6 +36,7 @@ class Controller:
                f'С учетом сложного процента надо откладывать {int(yearly)} рублей в год\n' \
                f'Ожидаемая доходность: {round(average_profit*100, 1)} % в год\n\n' \
                f'Для соответствия инвестиционному плану в этом месяце надо купить: \n' \
+               f'Инвестиционная стратегия: {strategy_text}' \
                f'{final_text}'
 
     def _search_fund_by_id(self, funds, id) -> Fund:
