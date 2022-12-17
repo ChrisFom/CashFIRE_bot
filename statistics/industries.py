@@ -1,6 +1,7 @@
 from collections import defaultdict
 
 from data_source.data_loaders import DBLoader
+from utils.industries_mapping import mapping
 
 
 class IndustriesStatistics:
@@ -12,7 +13,7 @@ class IndustriesStatistics:
         industries = [list(i) for i in industries]
         nice_industries = []
         for i in industries:
-            nice_industries.append(f'{i[0]} - {round(i[1], 3)}')
+            nice_industries.append(f'{mapping[i[0]]} - {round(i[1], 3)}')
         nice_industries_string = "\n".join(nice_industries)
         return nice_industries_string
 
