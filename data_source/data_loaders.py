@@ -67,6 +67,32 @@ class DBLoader:
             in raw_records
         ]
 
+    def load_raw_categories(self) -> dict:
+        raw_records = self._load_sql('''SELECT * FROM otrasl''')
+
+        return {
+            int(record['id_funds']): dict(
+                consumer_goods=record['consumer_goods'],
+                currency=record['currency'],
+                eco_houses=record['eco_houses'],
+                eco_materials=record['eco_materials'],
+                electrotransport=record['electrotransport'],
+                energetics=record['energetics'],
+                finance=record['finance'],
+                green_energetics=record['green_energetics'],
+                healthcare=record['healthcare'],
+                houses=record['houses'],
+                it=record['it'],
+                luxury_metals=record['luxury_metals'],
+                machinery=record['machinery'],
+                materials=record['materials'],
+                obligations=record['obligations'],
+                other=record['other'],
+                telecommunications=record['telecommunications'],
+            )
+            for record in raw_records
+        }
+
     def load_categories_of_funds(self) -> dict[int, list[str]]:
         """ Возвращает словарь с id фонда и списком отраслей  """
         raw_records = self._load_sql('''SELECT * FROM otrasl''')
