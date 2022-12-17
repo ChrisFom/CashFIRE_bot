@@ -35,7 +35,7 @@ def wake_up(update, context):
     name = update.message.chat.first_name
 
     buttons = ReplyKeyboardMarkup(
-        [['/DetermineInvestorType']],
+        [['/StartQuiz']],
         resize_keyboard=True)
     context.bot.send_message(
         chat_id=chat.id,
@@ -75,7 +75,7 @@ def industries_lev1(update, context):
     if update.message.chat_id in users:
         users.get(chat.id).expenses_per_month = expenses_per_month
 
-    buttons = ReplyKeyboardMarkup([['Банки и финансы', 'Машиностроение'], ['Металлы и добыча']],
+    buttons = ReplyKeyboardMarkup([['it', 'electricity'], ['machinery', 'eco_materials']],
                                   resize_keyboard=True)
     context.bot.send_message(
         chat_id=chat.id,
@@ -89,8 +89,10 @@ def industries_lev2(update, context):
     global industry1
     chat = update.effective_chat
     industry1 = update.message.text
+    if update.message.chat_id in users:
+        users.get(chat.id).categories.append(industry1)
     buttons = ReplyKeyboardMarkup(
-        [['Наука и инновации'], ['Нефть и газ', 'Потребительские товары']], resize_keyboard=True)
+        [['obligations'], ['green_energetics', 'currency']], resize_keyboard=True)
     context.bot.send_message(
         chat_id=chat.id,
         text='В компании из каких сфер деятельности хотел(а) бы вкладываться? Выбери 2 по приоритету',
@@ -103,7 +105,9 @@ def industries_lev3(update, context):
     global industry2
     chat = update.effective_chat
     industry2 = update.message.text
-    buttons = ReplyKeyboardMarkup([['Прочие отрасли', 'Транспорт']], resize_keyboard=True)
+    if update.message.chat_id in users:
+        users.get(chat.id).categories.append(industry2)
+    buttons = ReplyKeyboardMarkup([['finance', 'other', 'luxury_metals']], resize_keyboard=True)
     context.bot.send_message(
         chat_id=chat.id,
         text='В компании из каких сфер деятельности хотел(а) бы вкладываться? Выбери 3 по приоритету',
@@ -117,6 +121,8 @@ def thanks(update, context):
     chat = update.effective_chat
     industry3 = update.message.text
     print(industry3, '-индустрия 3')
+    if update.message.chat_id in users:
+        users.get(chat.id).categories.append(industry3)
     buttons = ReplyKeyboardMarkup([['Хочу узнать результат!']], resize_keyboard=True)
     context.bot.send_message(
         chat_id=chat.id,
@@ -154,7 +160,7 @@ def get_top_stocks(update, context):
 def main():
     updater.dispatcher.add_handler(CommandHandler('start', say_hi))
     updater.dispatcher.add_handler(CommandHandler('go', wake_up))
-    updater.dispatcher.add_handler(CommandHandler('DetermineInvestorType', determine_type))
+    updater.dispatcher.add_handler(CommandHandler('StartQuiz', determine_type))
     updater.dispatcher.add_handler(
         MessageHandler(Filters.regex(re.compile('лет|года', re.IGNORECASE)), get_years_before_retirement))
 
@@ -162,16 +168,14 @@ def main():
         MessageHandler(Filters.regex(re.compile('рублей|долларов|сом|тенге|евро', re.IGNORECASE)),
                        industries_lev1))
     updater.dispatcher.add_handler(MessageHandler(Filters.regex(re.compile(
-        'Банки и финансы|Машиностроение|Металлы и добыча',
+        'it|electricity|machinery|eco_materials',
         re.IGNORECASE)), industries_lev2))
 
     updater.dispatcher.add_handler(MessageHandler(Filters.regex(re.compile(
-        'Наука и инновации|Нефть и газ|Потребительские товары',
+        'obligations|green_energetics|currency',
         re.IGNORECASE)), industries_lev3))
     updater.dispatcher.add_handler(MessageHandler(Filters.regex(re.compile(
-        'Прочие отрасли|Транспорт', re.IGNORECASE)), thanks))
-    updater.dispatcher.add_handler(MessageHandler(Filters.regex(re.compile(
-        'Прочие отрасли|Транспорт', re.IGNORECASE)), thanks))
+        'finance|other|luxury_metals', re.IGNORECASE)), thanks))
 
     updater.dispatcher.add_handler(MessageHandler(Filters.regex(re.compile(
         'Хочу узнать результат!', re.IGNORECASE)), get_result))
