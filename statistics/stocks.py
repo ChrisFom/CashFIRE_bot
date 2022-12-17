@@ -12,7 +12,7 @@ class StocksStatistics:
         stocks = [list(i) for i in stocks]
         nice_stocks = []
         for i in stocks:
-            nice_stocks.append(f'{i[0]} - {round(i[1], 3)}')
+            nice_stocks.append(f'{i[0]} - {round(100*i[1], 2)}%')
         nice_stock_string = "\n".join(nice_stocks)
         return nice_stock_string
 
