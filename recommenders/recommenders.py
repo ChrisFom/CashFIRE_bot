@@ -17,13 +17,20 @@ class FundsRecommender:
         else:
             self.risk_model = fit_model()
 
-    def get_personal_funds(self, client: Client, funds: list[Fund], top_n: int = 5) -> dict[int, float]:
-        """ Возвращает персонализированные рекомендации фондов для клиента,
-        основываясь на предпочтительных категориях
+    def get_personal_funds(self, client: Client,
+                           funds: list[Fund],
+                           top_n: int = 5,
+                           use_risk_model: bool = True) -> dict[int, float]:
+        """ Возвращает персонализированные рекомендации фондов для клиента, основываясь на предпочтительных категориях
+        params:
+            client: Client - информация про клиента из бота
+            funds: list[Fund] - информация о фондах из БД
+            top_n: int - количество рекомендаций для выдачи пользователю
+            use_risk_model: bool - флаг использовать логистическую регрессию или функцию для оценки риска
         """
         personal_categories = client.categories
         funds = add_categories_to_fund(funds=funds)
-        funds_ratings = self._evaluate_funds_rating(funds=funds, use_risk_model=True)
+        funds_ratings = self._evaluate_funds_rating(funds=funds, use_risk_model=use_risk_model)
         personal_ratings = evaluate_personal_rating(categories=personal_categories,
                                                     funds_ratings=funds_ratings)
         sorted_personal_ratings = sort_funds_by_rating(personal_ratings)
