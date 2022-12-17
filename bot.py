@@ -150,7 +150,7 @@ def get_result(update, context):
 
 def get_top_stocks(update, context):
     chat = update.effective_chat
-    stocks = StocksStatistics().get_top_stocks(weights={5: 0.33, 6: 0.33, 7: 0.34}, n_top=10)
+    stocks = StocksStatistics().get_top_stocks(weights=users.get(chat.id).personal_funds, n_top=10)
     context.bot.send_message(
         chat_id=chat.id,
         text=stocks,
