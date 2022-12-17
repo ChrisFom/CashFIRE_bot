@@ -30,6 +30,9 @@ class RiskModel:
 
     def predict(self, test_data: np.ndarray) -> np.array:
         """ Возвращает предикты модели """
+        for i, elem in enumerate(test_data):
+            if elem is None:
+                test_data[i] = 0.0
         return self.model.predict_proba(test_data.reshape(1, -1))
 
     def _save_model(self):
