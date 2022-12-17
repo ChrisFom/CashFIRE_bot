@@ -8,6 +8,7 @@ from models.models import Fund
 
 
 def get_funds_info() -> list[Fund]:
+    """ Загружает из БД данные о фондах """
     loader = DBLoader()
     funds_info = loader.load_funds()
 
@@ -18,25 +19,31 @@ class RiskModel:
     def __init__(self):
         self.model = LogisticRegression()
 
-    def fit(self, train_data: np.ndarray, train_target: np.ndarray):
+    def fit(self, train_data: np.ndarray, train_target: np.ndarray) -> None:
+        """ Обучаем риск модель """
         self.model.fit(train_data, train_target)
         self._save_model()
 
-    def predict(self, test_data: np.ndarray) -> float:
-        return self.model.predict_proba(test_data.reshape(1, -1))[0, 1]
+    def predict(self, test_data: np.ndarray) -> np.array:
+        """ Возвращает предикты модели """
+        return self.model.predict_proba(test_data.reshape(1, -1))
 
     def _save_model(self):
         save_path = Path('../pretrained_models').absolute() / 'risk_model.pkl'
         with open(save_path, 'wb') as f:
             pickle.dump(self.model, f)
 
-    def load_model(self, model_path: Path):
+    def load_model(self, model_path: Path) -> None:
+        """ Загружает обученную модель
+            params:
+                model_path: Path - путь до предобученной модели
+        """
         with open(model_path, 'rb') as f:
             self.model = pickle.load(f)
 
 
 def generate_synthetic_data() -> tuple[np.ndarray, np.ndarray]:
-    """ """
+    """ Генерирует синтетические данные для обучения модели """
     features = ['price', 'profit', 'volatility', 'positive_years', 'negative_years']
 
     funds = get_funds_info()

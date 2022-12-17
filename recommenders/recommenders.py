@@ -40,7 +40,7 @@ class FundsRecommender:
 
     def _evaluate_funds_rating(self, funds: list[Fund], use_risk_model: bool = True) -> dict[
         int, dict[str, Union[float, list[str]]]]:
-        """ Возвращает отсортированный по рейтингу список id фондов """
+        """ Рассчитывает рейтинги фондов на основании их доходности и степени риска """
         funds_ratings = dict()
         for fund in funds:
             if use_risk_model:
@@ -50,7 +50,7 @@ class FundsRecommender:
                                           fund.positive_years,
                                           fund.negative_years])
                 features_data = np.where(features_data == None, 0, features_data)
-                fund.risk_level = self.risk_model.predict(features_data)
+                fund.risk_level = self.risk_model.predict(features_data)[0, 1]
             else:
                 fund.default_count_risk_level()
             rating = fund_ranking_function(fund)
@@ -69,10 +69,12 @@ def evaluate_personal_rating(categories: list[str],
 
 
 def sort_funds_by_rating(funds_ratings: dict[int, dict[str, Union[float, list[str]]]]):
+    """ Сортирует фонды по рейтингу """
     return sorted(funds_ratings.items(), key=lambda k: k[1]['rating'], reverse=True)
 
 
 def add_categories_to_fund(funds: list[Fund]) -> list[Fund]:
+    """ Добавляет категории, акции из которых присутствуют в фонде """
     loader = DBLoader()
     categories = loader.load_categories_of_funds()
     for fund in funds:
@@ -81,12 +83,12 @@ def add_categories_to_fund(funds: list[Fund]) -> list[Fund]:
     return funds
 
 
-def predict_next_year_profit():
-    """ Предсказываем для фонда доходность в следующем году """
+# def predict_next_year_profit():
+#     """ Предсказывает для фонда доходность в следующем году """
 
 
 def fund_ranking_function(fund: Fund) -> float:
-    """ """
+    """ Рассчитывает рейтинг фонда по его доходности и степени риска """
     risk_level = fund.risk_level
     profit = fund.average_profit
 
@@ -95,6 +97,7 @@ def fund_ranking_function(fund: Fund) -> float:
 
 
 def sigmoid(value):
+    """ Реализация логистической функции """
     return 1 / (1 + 0.5 * np.exp(- (value - 5)))
 
 
