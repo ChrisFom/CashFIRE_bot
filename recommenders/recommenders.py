@@ -26,7 +26,7 @@ class FundsRecommender:
             client: Client - информация про клиента из бота
             funds: list[Fund] - информация о фондах из БД
             top_n: int - количество рекомендаций для выдачи пользователю
-            use_risk_model: bool - флаг использовать логистическую регрессию или функцию для оценки риска
+            use_risk_model: bool - флаг использовать логистическую регрессию или функцию для оценки риска (по умолчанию True)
         """
         personal_categories = client.categories
         funds = add_categories_to_fund(funds=funds)
