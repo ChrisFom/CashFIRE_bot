@@ -17,10 +17,13 @@ class FundsRecommender:
         else:
             self.risk_model = fit_model()
 
-    def get_personal_funds(self, client: Client,
-                           funds: list[Fund],
-                           top_n: int = 5,
-                           use_risk_model: bool = True) -> dict[int, float]:
+    def get_personal_funds(
+        self,
+        client: Client,
+        funds: list[Fund],
+        top_n: int = 5,
+        use_risk_model: bool = True,
+    ) -> dict[int, float]:
         """ Возвращает персонализированные рекомендации фондов для клиента, основываясь на предпочтительных категориях
         params:
             client: Client - информация про клиента из бота
@@ -51,7 +54,7 @@ class FundsRecommender:
                     fund.positive_years,
                     fund.negative_years],
                 )
-                features_data = np.where(features_data == None, 0, features_data)
+                features_data = np.where(features_data is None, 0, features_data)
                 fund.risk_level = self.risk_model.predict(features_data)[0, 1]
             else:
                 fund.default_count_risk_level()
