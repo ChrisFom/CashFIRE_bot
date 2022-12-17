@@ -44,23 +44,29 @@ class FundsRecommender:
         funds_ratings = dict()
         for fund in funds:
             if use_risk_model:
-                features_data = np.array([fund.price,
-                                          fund.average_profit,
-                                          fund.average_volatility,
-                                          fund.positive_years,
-                                          fund.negative_years])
+                features_data = np.array([
+                    fund.price,
+                    fund.average_profit,
+                    fund.average_volatility,
+                    fund.positive_years,
+                    fund.negative_years],
+                )
                 features_data = np.where(features_data == None, 0, features_data)
                 fund.risk_level = self.risk_model.predict(features_data)[0, 1]
             else:
                 fund.default_count_risk_level()
             rating = fund_ranking_function(fund)
-            funds_ratings[fund.id] = dict(rating=rating,
-                                          categories=fund.categories)
+            funds_ratings[fund.id] = dict(
+                rating=rating,
+                categories=fund.categories,
+            )
         return funds_ratings
 
 
-def evaluate_personal_rating(categories: list[str],
-                             funds_ratings: dict[int, dict[str, Union[float, list[str]]]]):
+def evaluate_personal_rating(
+    categories: list[str],
+    funds_ratings: dict[int, dict[str, Union[float, list[str]]]],
+):
     """ Считает рейтинг фондов, учитывая предпочтительные категории клиента """
     for fund_id, fund_info in funds_ratings.items():
         number_of_categories = len(list(set(fund_info['categories']) & set(categories)))
@@ -103,11 +109,15 @@ def sigmoid(value):
 
 if __name__ == "__main__":
     funds = get_funds_info()
-    client = Client(years_before_retirement=20,
-                    expenses_per_month=50000,
-                    categories=['healthcare', 'it', 'consumer_goods'])
+    client = Client(
+        years_before_retirement=20,
+        expenses_per_month=50000,
+        categories=['healthcare', 'it', 'consumer_goods'],
+    )
     recommender = FundsRecommender()
-    personal_funds = recommender.get_personal_funds(client=client,
-                                                    funds=funds)
+    personal_funds = recommender.get_personal_funds(
+        client=client,
+        funds=funds,
+    )
 
-    pprint(funds)
+    pprint(personal_funds)

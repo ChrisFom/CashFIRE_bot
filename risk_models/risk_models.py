@@ -21,8 +21,12 @@ class RiskModel:
 
     def fit(self, train_data: np.ndarray, train_target: np.ndarray) -> None:
         """ Обучаем риск модель """
+        for l in train_data[:]:
+            for i, elem in enumerate(l):
+                if elem is None:
+                    l[i] = 0.0
         self.model.fit(train_data, train_target)
-        self._save_model()
+        # self._save_model()
 
     def predict(self, test_data: np.ndarray) -> np.array:
         """ Возвращает предикты модели """
