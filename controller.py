@@ -3,6 +3,7 @@ import logging
 from data_source.data_loaders import DBLoader
 from models.models import Client, Fund
 from recommenders.recommenders import FundsRecommender
+from utils.inflation import INFLATION_RATE
 
 
 class Controller:
@@ -16,7 +17,8 @@ class Controller:
         return self.evaluator.get_personal_funds(client, self.funds)
 
     def get_text_about_stocks(self, client: Client) -> str:
-        fire_number = (client.expenses_per_month * 12 / 0.04)
+        inflation_expenses_per_month = (client.expenses_per_month * (INFLATION_RATE**client.years_before_retirement))
+        fire_number = (inflation_expenses_per_month * 12 / 0.04)
         average_profit = sum(
             self._search_fund_by_id(self.funds, key).average_profit * value
             for key, value
@@ -32,6 +34,7 @@ class Controller:
                           f' ( доходность {round(fund_info.average_profit*100, 1)} % )\n'
         return f'\nДо пенсии осталось {client.years_before_retirement} лет\n' \
                f'Ежемесячные траты составляют {client.expenses_per_month} рублей\n' \
+               f'Ежемесячные траты с учетом инфляции составят {inflation_expenses_per_month}\n' \
                f'Без учета сложного процента надо откладывать {int(fire_number / client.years_before_retirement)} рублей в год\n' \
                f'С учетом сложного процента надо откладывать {int(yearly)} рублей в год\n' \
                f'Ожидаемая доходность: {round(average_profit*100, 1)} % в год\n\n' \
